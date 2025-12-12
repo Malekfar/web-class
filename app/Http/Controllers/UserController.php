@@ -2,18 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\User\StoreRequest;
-use App\Http\Requests\User\UpdateRequest;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
-use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Contracts\View\Factory;
+use App\Http\Requests\User\StoreRequest;
+use App\Http\Requests\User\UpdateRequest;
 
 class UserController extends Controller
 {
     public function index(): Factory|View
     {
-        return view('users.index');
+        $users = Cache::remember('users', 36000, function () {
+            return \App\Models\User::all();
+        });
+        return view('users.index', ['users' => $users]);
     }
 
     public function create(): Factory|View
@@ -26,6 +30,7 @@ class UserController extends Controller
         $data = $request->validated();
         $data['password'] = bcrypt($data['password']);
         User::create($data);
+        Cache::forget('users');
         return redirect()->route('users.index');
     }
 

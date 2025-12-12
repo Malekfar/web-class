@@ -14,7 +14,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach(\App\Models\User::all() as $user)
+                @foreach($users as $user)
                     <tr>
                         <td>{{$user->id}}</td>
                         <td>{{$user->name}}</td>
